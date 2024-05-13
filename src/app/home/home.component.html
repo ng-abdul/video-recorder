@@ -1,0 +1,23 @@
+
+  <div>
+    <button (click)="toggleWebcam()">
+      {{ showWebcam ? 'Stop Camera' : 'Start Camera' }}
+    </button>
+  </div>
+  <div *ngIf="showWebcam">
+    <webcam (initError)="handleInitError($event)"></webcam>
+  </div>
+  <div>
+    <p id="timer">{{ timerValue }}</p>
+  </div>
+    <div>
+        <label for="cameraSelect">Select Camera:</label>
+        <select id="cameraSelect" (change)="switchCamera($event)">
+          <option *ngFor="let camera of availableCameras" [value]="camera.deviceId">{{ camera.label }}</option>
+        </select>
+        
+      </div>
+  <div>
+    <video src="" id="video"></video>
+  </div>
+   
