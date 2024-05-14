@@ -1,27 +1,31 @@
-import { Component, OnInit } from '@angular/core';
-import { WebcamInitError, WebcamModule, WebcamImage, WebcamUtil } from 'ngx-webcam';
+import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { WebcamInitError, WebcamModule, WebcamImage, WebcamUtil, WebcamComponent } from 'ngx-webcam';
 import { CommonModule } from '@angular/common';
-import { NgModel } from '@angular/forms';
-import { FormsModule } from '@angular/forms';
-import { log } from 'console';
+import { FormsModule, NgModel } from '@angular/forms';
+import { Observable, Subject } from 'rxjs';
+import { Router } from '@angular/router';
+import { log } from 'node:console';
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [WebcamModule, CommonModule,FormsModule],
+  imports: [WebcamModule, CommonModule, FormsModule],
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.css']
+  styleUrls: ['./home.component.css'],
+  encapsulation:ViewEncapsulation.None
 })
-
 export class HomeComponent implements OnInit {
-  public showWebcam: boolean = false;
-  public timerValue: string = '00:00';
-  private timerInterval: any;
-  private startTime: any;
+  public currentPage: string = ''
+  public showWebcam: boolean = true;
   public availableCameras: MediaDeviceInfo[] = [];
   public selectedCamera: MediaDeviceInfo | null = null;
-public videoRef:any;
-  constructor() {
-       if (typeof navigator !== 'undefined') { 
+  public mediaStream!: MediaStream;
+  public videoOptions: MediaTrackConstraints = {};
+  public isFrontCameraActive: boolean = true;
+  private trigger: Subject<void> = new Subject<void>()
+  private nextWebcam: Subject<boolean | string> = new Subject<boolean | string>()
+  @ViewChild(WebcamComponent) webcamComponent!: WebcamComponent;
+  constructor(public router:Router) {
+    if (typeof navigator !== 'undefined') {
       WebcamUtil.getAvailableVideoInputs()
         .then((mediaDevices: MediaDeviceInfo[]) => {
           this.availableCameras = mediaDevices;
@@ -34,71 +38,106 @@ public videoRef:any;
   }
 
   ngOnInit(): void {
-    this.videoRef = document.getElementById('video')
-    console.log('video', this.videoRef);
-    
-    
-  }
+    this.main();
+    // this.toggleWebcam();
+    if (this.router.url.includes('forgot-password')) {
+      this.currentPage = 'forgot-password'
+    }
 
+  }
+ 
+  takeSnapShot() {
+    this.trigger.next()
+  }
+  toggleCamera(directionOrDeviceId: boolean | string) {
+    this.nextWebcam.next(directionOrDeviceId)
+  }
+  get triggerObservable(): Observable<void> {
+    return this.trigger.asObservable()
+  }
+  get nextWebcamObservable(): Observable<boolean | string> {
+    return this.nextWebcam.asObservable()
+  }
   public handleInitError(error: WebcamInitError): void {
     if (error.mediaStreamError && error.mediaStreamError.name === "NotAllowedError") {
       console.warn("Camera access was not allowed by user!");
     }
   }
 
-  public toggleWebcam(): void {
-    this.showWebcam = !this.showWebcam;
-    if (this.showWebcam) {
-      this.startTimer();
-    } else {
-      this.stopTimer();
+  // public toggleWebcam(): void {
+  //   this.showWebcam = !this.showWebcam;
+  //   const startButton = document.getElementById('startRecording') as HTMLButtonElement;
+  //   const stopButton = document.getElementById('stopRecording') as HTMLButtonElement;
+
+  //   if (this.showWebcam) {
+  //     startButton.removeAttribute('disabled');
+  //     stopButton.setAttribute('disabled', '');
+  //   } else {
+  //     startButton.setAttribute('disabled', '');
+  //     stopButton.setAttribute('disabled', '');
+  //   }
+
+  // }
+
+
+  main = async () => {
+    const buttonStart = document.querySelector<HTMLButtonElement>('#startRecording')
+    const buttonStop = document.querySelector<HTMLButtonElement>('#stopRecording')
+    const videoLive = document.querySelector<HTMLVideoElement>('#videoLive')
+    const videoRecorded = document.querySelector<HTMLVideoElement>('#videoRecorded')
+  
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: true,
+      audio: true,
+    })
+  
+    if (videoLive) {
+      videoLive.srcObject = stream
     }
-  }
-
-
-  public switchCamera(event: any): void {
-    const deviceId = event.target.value;
-    const selectedCamera = this.availableCameras.find(camera => camera.deviceId === deviceId);
-    if (selectedCamera) {
-      this.selectedCamera = selectedCamera;
+  
+    if (!MediaRecorder.isTypeSupported('video/webm')) {
+      console.warn('video/webm is not supported')
+    }
+  
+    const mediaRecorder = new MediaRecorder(stream, {
+      mimeType: 'video/webm',
+    })
+  
+    if (buttonStart ) {
+      buttonStart.addEventListener('click', () => {
+        mediaRecorder.start();
+        buttonStart.style.display = 'none';
+        buttonStop!.style.display = 'inline-block'; 
+        videoRecorded!.style.display = 'none'; 
+      });
+      console.log("click");
+      
+  
+     setTimeout(() => {
+      mediaRecorder.stop();
+      buttonStart.style.display = 'inline-block'; 
+      buttonStop!.style.display = 'none'; 
+      videoRecorded!.style.display = 'block'; 
+     }, 10000);
+       
+    }
+    if(buttonStop){
+      buttonStop.addEventListener('click', ()=>{
+        mediaRecorder.stop();
+        buttonStart!.style.display = 'inline-block';
+        buttonStop.style.display = 'none';
+        videoRecorded!.style.display = 'block'; 
+      })
+    }
+  
+    if (videoRecorded) {
+      mediaRecorder.addEventListener('dataavailable', (event: BlobEvent) => {
+        if (event.data) {
+          videoRecorded.src = URL.createObjectURL(event.data);
+          videoRecorded.style.display = 'block'; 
+        }
+      });
     }
   }
   
-
-  private startTimer(): void {
-    const storedStartTime = localStorage.getItem('timerStartTime');
-    if (!storedStartTime) {
-      this.startTime = Date.now();
-      localStorage.setItem('timerStartTime', this.startTime.toString());
-    } else {
-      this.startTime = parseInt(storedStartTime, 10);
-    }
-
-    this.timerInterval = setInterval(() => {
-      const elapsedTime = Date.now() - this.startTime;
-      this.timerValue = this.formatTime(elapsedTime);
-    }, 1000);
-  }
-
-  private stopTimer(): void {
-    clearInterval(this.timerInterval);
-    const startTimeString = localStorage.getItem('timerStartTime');
-    if (startTimeString) {
-      const startTime = parseInt(startTimeString, 10);
-      const elapsedTime = Date.now() - startTime;
-      this.timerValue = this.formatTime(elapsedTime);
-      localStorage.removeItem('timerStartTime');
-    }
-  }
-
-  private formatTime(milliseconds: number): string {
-    const totalSeconds = Math.floor(milliseconds / 1000);
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
-    return `${this.padZero(minutes)}:${this.padZero(seconds)}`;
-  }
-
-  private padZero(num: number): string {
-    return num < 10 ? '0' + num : num.toString();
-  }
 }

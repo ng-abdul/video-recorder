@@ -1,23 +1,23 @@
 
+
+
+<div class="container" >
+
+ 
+<div id="videoLiveBox">
+  <video autoplay muted playsinline id="videoLive"></video>
+</div>
+<div class="startStopBtns">
+  <i class="fa-solid fa-border-all"></i>
   <div>
-    <button (click)="toggleWebcam()">
-      {{ showWebcam ? 'Stop Camera' : 'Start Camera' }}
-    </button>
+    <button type="button" id="startRecording" style="display: inline-block;">GO</button>
+    <button type="button" id="stopRecording" style="display: none;" ><i class="fa-solid fa-stop"></i>Stop</button>
+
   </div>
-  <div *ngIf="showWebcam">
-    <webcam (initError)="handleInitError($event)"></webcam>
-  </div>
-  <div>
-    <p id="timer">{{ timerValue }}</p>
-  </div>
-    <div>
-        <label for="cameraSelect">Select Camera:</label>
-        <select id="cameraSelect" (change)="switchCamera($event)">
-          <option *ngFor="let camera of availableCameras" [value]="camera.deviceId">{{ camera.label }}</option>
-        </select>
-        
-      </div>
-  <div>
-    <video src="" id="video"></video>
-  </div>
-   
+  <i class="fa-solid fa-repeat"></i>
+</div> 
+<div>
+  <video controls playsinline id="videoRecorded" style="display: none;"></video>
+</div>
+
+</div>
