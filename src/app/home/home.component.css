@@ -1,9 +1,9 @@
-body{
+body {
     margin: 0;
     padding: 0;
 }
 
-.container{
+.containerBox {
     display: flex;
     align-items: start;
     justify-content: center;
@@ -12,7 +12,11 @@ body{
 
 
 }
-.startBtn,.SwitchCamera, #startRecording, #stopRecording{
+
+.startBtn,
+.SwitchCamera,
+#startRecording,
+#stopRecording {
     background: #f5b238;
     outline: 0;
     border: 0;
@@ -24,9 +28,10 @@ body{
     margin-top: 12px;
     margin-bottom: 12px;
     margin-right: 6px;
-    
+
 }
-#startRecording{
+
+#startRecording {
     border-radius: 50%;
     width: 70px;
     height: 70px;
@@ -34,32 +39,39 @@ body{
     font-weight: 400;
     margin: 0px 90px;
 }
-#stopRecording{
+
+#stopRecording {
     color: black;
     font-size: 21px;
     font-weight: 400;
-    margin: 0px 90px;
+    margin: 0px 60px;
+    width: fit-content;
 }
+
 button:disabled {
-    opacity: 0.5; 
-    cursor: not-allowed; 
-  }
-  .startStopBtns{  
-    position: absolute;
-    top: 385px;
-    left: 122px;
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.startStopBtns {
+    width: 60%;
+    background-color: lightslategray;
     display: flex;
     align-items: center;
     justify-content: space-around;
-    /* width: 50%; */
-
+    flex-direction: column;
+    margin-top: -10px;
+    height: 98px;
 }
-  .fa-stop{
+
+.fa-stop {
     color: red;
     border-radius: 50%;
     padding-right: 12px;
-  }
-  .fa-repeat, .fa-border-all{
+}
+
+.fa-repeat,
+.fa-border-all {
     border: 1px solid white;
     color: #f5b238;
     font-size: 19px;
@@ -67,33 +79,63 @@ button:disabled {
     border-radius: 50%;
 }
 
+#videoRecorded {
+    display: block;
+    width: 163px;
+    height: 79px;
+    position: absolute;
+    top: -85px;
+
+}
+
+.videoRecordedBox {
+    width: 100%;
+    display: flex;
+    align-items: end;
+    justify-content: end;
+    flex-direction: column;
+    position: relative;
+}
+
+#videoLiveBox {
+    width: 100%;
+}
+
+#videoLive {
+    width: 60%;
+}
+
+.DownloadRecordedVideo {
+    display: none;
+}
+
+.actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+}
+
+@media (max-width:700px) {
+    #videoLive {
+        width: 100% !important;
+        height: 90vh;
+        object-fit: cover;
+    }
+
+    .startStopBtns {
+        width: 100%;
+        /* margin-top: -110px; */
+
+    }
+}
+
 @media (max-width:400px) {
-
-    #videoLive{
-        width: 100% !important;
-       
-            width: 100%;
-            height: 100vh;
-            object-fit: cover;
-        }
-    
-    #videoRecorded{
-        width: 100% !important;
-  
-    }
-    #startRecording {
-      height: 50px;
-      width: 50px;
-        margin: 0 66px !important;
-    }
     #stopRecording {
-      
-        margin: 0 20px !important;
+        margin: 0px 30px;
     }
-    .startStopBtns{ 
-        top: 570px !important;
-        left: 62px !important;
-        
-    }
-     }
 
+    #startRecording {
+        margin: 0px 30px;
+    }
+}

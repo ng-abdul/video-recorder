@@ -39,45 +39,65 @@ export class HomeComponent implements OnInit {
 
   ngOnInit(): void {
     this.main();
-    // this.toggleWebcam();
-    if (this.router.url.includes('forgot-password')) {
-      this.currentPage = 'forgot-password'
-    }
+  }
 
+  downloadVideo() {
+    var video: any = document.getElementById('videoRecorded');
+    var videoSrc = video.src;
+    var a = document.createElement('a');
+    a.href = videoSrc;
+    console.log('click');
+    
+    a.download = 'video.mp4';
+    a.click();
+  }
+
+   async toggleCamera() {
+    const videoElement: any = document.getElementById('videoLive');
+    const constraints = {
+      video: {
+        facingMode: 'environment'
+      }
+    };
+  
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      videoElement.srcObject = stream;
+    } catch(err) {
+      console.error('Error accessing camera:', err);
+    }
+  }
+  
+  getActiveCamera() {
+    const videoElement: any = document.getElementById('videoLive');
+    const videoTracks = (videoElement.srcObject ? videoElement.srcObject.getVideoTracks() : []);
+    if (videoTracks.length > 0) {
+      const track = videoTracks[0];
+      const facingMode = track.getSettings().facingMode;
+      return facingMode;
+    }
+    return null;
   }
  
-  takeSnapShot() {
-    this.trigger.next()
-  }
-  toggleCamera(directionOrDeviceId: boolean | string) {
-    this.nextWebcam.next(directionOrDeviceId)
-  }
-  get triggerObservable(): Observable<void> {
-    return this.trigger.asObservable()
-  }
-  get nextWebcamObservable(): Observable<boolean | string> {
-    return this.nextWebcam.asObservable()
-  }
+  // takeSnapShot() {
+  //   this.trigger.next()
+  // }
+  // toggleCamera(directionOrDeviceId: boolean | string) {
+  //   this.nextWebcam.next(directionOrDeviceId)
+  // }
+  // get triggerObservable(): Observable<void> {
+  //   return this.trigger.asObservable()
+  // }
+  // get nextWebcamObservable(): Observable<boolean | string> {
+  //   return this.nextWebcam.asObservable()
+  // }
   public handleInitError(error: WebcamInitError): void {
     if (error.mediaStreamError && error.mediaStreamError.name === "NotAllowedError") {
       console.warn("Camera access was not allowed by user!");
     }
   }
 
-  // public toggleWebcam(): void {
-  //   this.showWebcam = !this.showWebcam;
-  //   const startButton = document.getElementById('startRecording') as HTMLButtonElement;
-  //   const stopButton = document.getElementById('stopRecording') as HTMLButtonElement;
 
-  //   if (this.showWebcam) {
-  //     startButton.removeAttribute('disabled');
-  //     stopButton.setAttribute('disabled', '');
-  //   } else {
-  //     startButton.setAttribute('disabled', '');
-  //     stopButton.setAttribute('disabled', '');
-  //   }
-
-  // }
 
 
   main = async () => {
@@ -85,6 +105,9 @@ export class HomeComponent implements OnInit {
     const buttonStop = document.querySelector<HTMLButtonElement>('#stopRecording')
     const videoLive = document.querySelector<HTMLVideoElement>('#videoLive')
     const videoRecorded = document.querySelector<HTMLVideoElement>('#videoRecorded')
+    const DownloadRecordedVideobtn = document.querySelector<HTMLVideoElement>('.DownloadRecordedVideo')
+    const flipBtn = document.querySelector('#flip-btn');
+
   
     const stream = await navigator.mediaDevices.getUserMedia({
       video: true,
@@ -102,6 +125,16 @@ export class HomeComponent implements OnInit {
     const mediaRecorder = new MediaRecorder(stream, {
       mimeType: 'video/webm',
     })
+
+    // flipBtn!.addEventListener('click', () =>{
+    //   if( stream == null ) return
+    //   stream.getTracks().forEach(t => {
+    //     t.stop();
+    //   });
+    //   this.isFrontCameraActive = !this.isFrontCameraActive;  
+    //       capture();
+    // })
+  
   
     if (buttonStart ) {
       buttonStart.addEventListener('click', () => {
@@ -109,6 +142,7 @@ export class HomeComponent implements OnInit {
         buttonStart.style.display = 'none';
         buttonStop!.style.display = 'inline-block'; 
         videoRecorded!.style.display = 'none'; 
+        DownloadRecordedVideobtn!.style.display = 'none'; 
       });
       console.log("click");
       
@@ -117,7 +151,8 @@ export class HomeComponent implements OnInit {
       mediaRecorder.stop();
       buttonStart.style.display = 'inline-block'; 
       buttonStop!.style.display = 'none'; 
-      videoRecorded!.style.display = 'block'; 
+      videoRecorded!.style.display = 'inline-block'; 
+      DownloadRecordedVideobtn!.style.display = 'inline-block'; 
      }, 10000);
        
     }
@@ -126,7 +161,8 @@ export class HomeComponent implements OnInit {
         mediaRecorder.stop();
         buttonStart!.style.display = 'inline-block';
         buttonStop.style.display = 'none';
-        videoRecorded!.style.display = 'block'; 
+        videoRecorded!.style.display = 'inline-block'; 
+        DownloadRecordedVideobtn!.style.display = 'inline-block'; 
       })
     }
   
@@ -134,10 +170,13 @@ export class HomeComponent implements OnInit {
       mediaRecorder.addEventListener('dataavailable', (event: BlobEvent) => {
         if (event.data) {
           videoRecorded.src = URL.createObjectURL(event.data);
-          videoRecorded.style.display = 'block'; 
+          videoRecorded.style.display = 'inline-block'; 
+          // DownloadRecordedVideobtn!.style.display = 'inline-block'; 
         }
       });
     }
   }
-  
+
+
 }
+

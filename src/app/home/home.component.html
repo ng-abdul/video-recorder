@@ -1,23 +1,38 @@
+<div class="containerBox">
 
-
-
-<div class="container" >
-
- 
-<div id="videoLiveBox">
-  <video autoplay muted playsinline id="videoLive"></video>
-</div>
-<div class="startStopBtns">
-  <i class="fa-solid fa-border-all"></i>
-  <div>
-    <button type="button" id="startRecording" style="display: inline-block;">GO</button>
-    <button type="button" id="stopRecording" style="display: none;" ><i class="fa-solid fa-stop"></i>Stop</button>
-
+  <div id="videoLiveBox">
+    <video autoplay muted playsinline id="videoLive"></video>
   </div>
-  <i class="fa-solid fa-repeat"></i>
-</div> 
-<div>
-  <video controls playsinline id="videoRecorded" style="display: none;"></video>
-</div>
 
+  <div class="startStopBtns">
+    <div class="videoRecordedBox">
+      <video controls playsinline id="videoRecorded" style="display: none;"></video>
+    </div>
+    <div class="actions">
+      <i class="fa-solid fa-border-all"></i>
+      <div>
+        <button type="button" id="startRecording" style="display: inline-block;">GO</button>
+        <button type="button" id="stopRecording" style="display: none;" data-toggle="modal"
+          data-target="#addNewCategoryBox"><i class="fa-solid fa-stop"></i>Stop</button>
+      </div>
+      <i class="fa-solid fa-repeat" (click)="toggleCamera()" id="flip-btn"></i>
+    </div>
+  </div>
 </div>
+<div class="modal fade" id="addNewCategoryBox" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span>&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to save the video?</p>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary w-100" id="addBtn" (click)="downloadVideo()">Save Video</button>
+        </div>
+      </div>
+    </div>
+  </div>
