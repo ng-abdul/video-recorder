@@ -10,8 +10,8 @@ describe('JoinMeetingComponent', () => {
     await TestBed.configureTestingModule({
       imports: [JoinMeetingComponent]
     })
-    .compileComponents();
-    
+      .compileComponents();
+
     fixture = TestBed.createComponent(JoinMeetingComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

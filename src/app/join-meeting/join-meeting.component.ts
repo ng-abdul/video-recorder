@@ -9,10 +9,10 @@ import { Router } from '@angular/router';
   styleUrl: './join-meeting.component.css'
 })
 export class JoinMeetingComponent {
-  constructor(public router:Router){
+  constructor(public router: Router) {
 
   }
-gotoMeeting(){
-  this.router.navigate(['/meeting']);
-}
+  gotoMeeting() {
+    this.router.navigate(['/meeting']);
+  }
 }
