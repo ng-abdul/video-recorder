@@ -138,4 +138,12 @@ button:disabled {
     #startRecording {
         margin: 0px 30px;
     }
+    .startStopBtns{
+        height: 114px;
+    }
+}
+.timmer{
+    color: white;
+    padding: 2px 5px;
+    font-size: 15px;
 }
