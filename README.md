@@ -33,3 +33,4 @@ npm install
 ```
 
 
+![App Screenshot](../video-recorder//src/assets/Screenshot%20(269).png)

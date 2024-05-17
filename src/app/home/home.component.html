@@ -30,8 +30,11 @@
       </div>
       <div class="modal-body">
         <p>Are you sure you want to save the video?</p>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-primary w-100" id="addBtn" (click)="downloadVideo()">Save Video</button>
+        <div class="modal-footer d-flex justify-content-between align-items-center" >
+
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close" class="btn btn-secondary" id="addBtn" style="width: 45%;">Cancel</button>
+
+          <button type="button" class="btn btn-primary" style="width: 45%;" id="addBtn" (click)="downloadVideo()">Save Video</button>
         </div>
       </div>
     </div>
