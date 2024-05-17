@@ -21,6 +21,7 @@ export class HomeComponent implements OnInit {
   public startTime: number = 0;
   public timerInterval: any;
   public timerValue: string = "00:00";
+  mediaRecorder: any;
 
   constructor() { }
 
@@ -51,7 +52,6 @@ export class HomeComponent implements OnInit {
       videoElement.srcObject = stream;
       this.isFrontCameraActive = !this.isFrontCameraActive; 
     } catch (err) {
-      console.error('Error accessing camera:', err);
     }
   }
   
