@@ -32,5 +32,4 @@ npm install
 
 ```
 
-
-![App Screenshot](../video-recorder//src/assets/Screenshot%20(269).png)
+![Screenshot (265)](https://github.com/ng-abdul/video-recorder/assets/169676913/c8ef6db3-50b5-4e33-86b9-0743a62ebd9f)
