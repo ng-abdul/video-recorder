@@ -3,7 +3,7 @@ import { WebcamInitError } from 'ngx-webcam';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgModel } from '@angular/forms';
 import { Router } from '@angular/router';
-import { log } from 'node:console';
+import { Console } from 'node:console';
 @Component({
   selector: 'app-home',
   standalone: true,
