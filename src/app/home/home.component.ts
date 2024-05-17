@@ -1,7 +1,7 @@
-import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, NgModel } from '@angular/forms';
-import { Router } from '@angular/router';
+import { FormsModule,  } from '@angular/forms';
+// import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-home',
@@ -18,11 +18,11 @@ export class HomeComponent implements OnInit {
   public mediaStream!: MediaStream;
   public videoOptions: MediaTrackConstraints = {};
   public isFrontCameraActive: boolean = true;
-  startTime: number = 0;
-  timerInterval: any;
-  timerValue: string = "00:00";
+  public startTime: number = 0;
+  public timerInterval: any;
+  public timerValue: string = "00:00";
 
-  constructor(public router: Router) { }
+  constructor() { }
 
   ngOnInit(): void {
     this.main();
@@ -39,37 +39,22 @@ export class HomeComponent implements OnInit {
   }
 
   async toggleCamera() {
-    const videoElement: any = document.getElementById('videoLive');
+    const videoElement: HTMLVideoElement = document.getElementById('videoLive') as HTMLVideoElement;
     const constraints = {
       video: {
-        facingMode: 'environment'
+        facingMode: this.isFrontCameraActive ? 'user' : 'environment'
       }
     };
-
+  
     try {
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
       videoElement.srcObject = stream;
+      this.isFrontCameraActive = !this.isFrontCameraActive; 
     } catch (err) {
       console.error('Error accessing camera:', err);
     }
   }
-
-  getActiveCamera() {
-    const videoElement: any = document.getElementById('videoLive');
-    const videoTracks = (videoElement.srcObject ? videoElement.srcObject.getVideoTracks() : []);
-    if (videoTracks.length > 0) {
-      const track = videoTracks[0];
-      const facingMode = track.getSettings().facingMode;
-      return facingMode;
-    }
-    return null;
-  }
-
-  // public handleInitError(error: WebcamInitError): void {
-  //   if (error.mediaStreamError && error.mediaStreamError.name === "NotAllowedError") {
-  //     console.warn("Camera access was not allowed by user!");
-  //   }
-  // }
+  
 
   main = async () => {
     const buttonStart = document.querySelector<HTMLButtonElement>('#startRecording');
@@ -99,7 +84,7 @@ export class HomeComponent implements OnInit {
     if (buttonStart) {
       buttonStart.addEventListener('click', () => {
         mediaRecorder.start();
-        this.startTimer();  // Start the timer when recording starts
+        this.startTimer();  
         buttonStart.style.display = 'none';
         buttonStop!.style.display = 'inline-block';
         videoRecorded!.style.display = 'none';
@@ -108,7 +93,7 @@ export class HomeComponent implements OnInit {
 
       setTimeout(() => {
         mediaRecorder.stop();
-        this.stopTimer();  // Stop the timer when recording stops
+        this.stopTimer();  
         buttonStart.style.display = 'inline-block';
         buttonStop!.style.display = 'none';
         videoRecorded!.style.display = 'inline-block';
@@ -119,7 +104,7 @@ export class HomeComponent implements OnInit {
     if (buttonStop) {
       buttonStop.addEventListener('click', () => {
         mediaRecorder.stop();
-        this.stopTimer();  // Stop the timer when recording stops
+        this.stopTimer(); 
         buttonStart!.style.display = 'inline-block';
         buttonStop.style.display = 'none';
         videoRecorded!.style.display = 'inline-block';
@@ -137,7 +122,7 @@ export class HomeComponent implements OnInit {
     }
   }
 
-  private startTimer(): void {
+  public startTimer(): void {
     const storedStartTime = localStorage.getItem('timerStartTime');
     if (!storedStartTime) {
       this.startTime = Date.now();
@@ -152,7 +137,7 @@ export class HomeComponent implements OnInit {
     }, 1000);
   }
 
-  private stopTimer(): void {
+  public stopTimer(): void {
     clearInterval(this.timerInterval);
     const startTimeString = localStorage.getItem('timerStartTime');
     if (startTimeString) {
@@ -173,4 +158,6 @@ export class HomeComponent implements OnInit {
   private padZero(num: number): string {
     return num < 10 ? '0' + num : num.toString();
   }
+
+  
 }
