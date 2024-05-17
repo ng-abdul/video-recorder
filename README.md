@@ -32,4 +32,11 @@ npm install
 
 ```
 
+## ScreenShots
+
+
+
+| Image 1                                  | Image 2                                  |
+| ---------------------------------------- | ---------------------------------------- |
+| ![Screenshot (275)](https://github.com/ng-abdul/video-recorder/assets/169676913/a2253945-14de-4eb9-b945-edcb9858c973)                | ![Screenshot (274)](https://github.com/ng-abdul/video-recorder/assets/169676913/0dd0b56e-a32e-4314-9ce6-80bdff68dc79)| 
 
