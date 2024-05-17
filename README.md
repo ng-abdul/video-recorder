@@ -35,6 +35,6 @@ npm install
 ## ScreenShots
 
 
-![Screenshot (275)](https://github.com/ng-abdul/video-recorder/assets/169676913/7cbbc985-5b41-494c-8115-ade6ca5c1089)
 
-![Screenshot (274)](https://github.com/ng-abdul/video-recorder/assets/169676913/cd5adcf3-6d92-4e74-a738-a6880b2d67f8)
+![Screenshot (275)](https://github.com/ng-abdul/video-recorder/assets/169676913/a2253945-14de-4eb9-b945-edcb9858c973)
+![Screenshot (274)](https://github.com/ng-abdul/video-recorder/assets/169676913/995278ac-b923-4d6b-9f1a-c2b3a79da68e)
