@@ -1,4 +1,5 @@
 /* To learn more about this file see: https://angular.io/config/tsconfig. */
+
 {
   "compileOnSave": false,
   "compilerOptions": {
@@ -15,11 +16,11 @@
     "experimentalDecorators": true,
     "moduleResolution": "node",
     "importHelpers": true,
-    "target": "ES2022",
-    "module": "ES2022",
+    "target": "es2015",
+    "module": "esnext", // or "es2022" if you prefer
     "useDefineForClassFields": false,
     "lib": [
-      "ES2022",
+      "es2022",
       "dom"
     ]
   },

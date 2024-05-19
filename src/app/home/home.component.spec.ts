@@ -45,7 +45,6 @@ describe('HomeComponent', () => {
   
     await component.main();
   
-    // mockButtonStart.click();
   
     expect(mediaRecorder.start).toHaveBeenCalled();
     expect(component.startTimer).toHaveBeenCalled();

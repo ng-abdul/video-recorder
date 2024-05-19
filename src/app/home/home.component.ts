@@ -1,7 +1,7 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule,  } from '@angular/forms';
-// import { Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+// import { Modal } from 'bootstrap';
 
 @Component({
   selector: 'app-home',
@@ -12,6 +12,7 @@ import { FormsModule,  } from '@angular/forms';
   encapsulation: ViewEncapsulation.None
 })
 export class HomeComponent implements OnInit {
+  @ViewChild('exampleModal') exampleModal!: ElementRef;
   public currentPage: string = '';
   public availableCameras: MediaDeviceInfo[] = [];
   public selectedCamera: MediaDeviceInfo | null = null;
@@ -21,17 +22,30 @@ export class HomeComponent implements OnInit {
   public startTime: number = 0;
   public timerInterval: any;
   public timerValue: string = "00:00";
-  mediaRecorder: any;
+  public mediaRecorder: MediaRecorder | undefined;
+  private buttonStart!: HTMLButtonElement;
+  private buttonStop!: HTMLButtonElement;
+  private videoLive!: HTMLVideoElement;
+  private videoRecorded!: HTMLVideoElement;
+  // private downloadRecordedVideobtn!: HTMLButtonElement;
 
   constructor() { }
 
   ngOnInit(): void {
+    this.queryDomElements();
     this.main();
   }
 
+  queryDomElements(): void {
+    this.buttonStart = document.querySelector<HTMLButtonElement>('#startRecording')!;
+    this.buttonStop = document.querySelector<HTMLButtonElement>('#stopRecording')!;
+    this.videoLive = document.querySelector<HTMLVideoElement>('#videoLive')!;
+    this.videoRecorded = document.querySelector<HTMLVideoElement>('#videoRecorded')!;
+    // this.downloadRecordedVideobtn = document.querySelector<HTMLButtonElement>('.DownloadRecordedVideo')!;
+  }
+
   downloadVideo() {
-    const video: any = document.getElementById('videoRecorded');
-    const videoSrc = video.src;
+    const videoSrc = this.videoRecorded.src;
     const a = document.createElement('a');
     a.href = videoSrc;
     console.log('click');
@@ -40,97 +54,92 @@ export class HomeComponent implements OnInit {
   }
 
   async toggleCamera() {
-    const videoElement: HTMLVideoElement = document.getElementById('videoLive') as HTMLVideoElement;
+    const videoElement: HTMLVideoElement = this.videoLive;
     const constraints = {
       video: {
         facingMode: this.isFrontCameraActive ? 'user' : 'environment'
       }
     };
-  
+
     try {
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
       videoElement.srcObject = stream;
-      this.isFrontCameraActive = !this.isFrontCameraActive; 
+      this.isFrontCameraActive = !this.isFrontCameraActive;
     } catch (err) {
+      console.error('Error accessing camera:', err);
     }
   }
-  
 
   main = async () => {
-    const buttonStart = document.querySelector<HTMLButtonElement>('#startRecording');
-    const buttonStop = document.querySelector<HTMLButtonElement>('#stopRecording');
-    const videoLive = document.querySelector<HTMLVideoElement>('#videoLive');
-    const videoRecorded = document.querySelector<HTMLVideoElement>('#videoRecorded');
-    const DownloadRecordedVideobtn = document.querySelector<HTMLVideoElement>('.DownloadRecordedVideo');
-    const flipBtn = document.querySelector('#flip-btn');
-
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: true,
-      audio: true,
-    });
-
-    if (videoLive) {
-      videoLive.srcObject = stream;
-    }
-
-    if (!MediaRecorder.isTypeSupported('video/webm')) {
-      console.warn('video/webm is not supported');
-    }
-
-    const mediaRecorder = new MediaRecorder(stream, {
-      mimeType: 'video/webm',
-    });
-
-    if (buttonStart) {
-      buttonStart.addEventListener('click', () => {
-        mediaRecorder.start();
-        this.startTimer();  
-        buttonStart.style.display = 'none';
-        buttonStop!.style.display = 'inline-block';
-        videoRecorded!.style.display = 'none';
-        DownloadRecordedVideobtn!.style.display = 'none';
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true,
       });
 
-      setTimeout(() => {
-        mediaRecorder.stop();
-        this.stopTimer();  
-        buttonStart.style.display = 'inline-block';
-        buttonStop!.style.display = 'none';
-        videoRecorded!.style.display = 'inline-block';
-        DownloadRecordedVideobtn!.style.display = 'inline-block';
-      }, 10000);
+      this.mediaStream = stream;
+      this.videoLive.srcObject = stream;
 
-    }
-    if (buttonStop) {
-      buttonStop.addEventListener('click', () => {
-        mediaRecorder.stop();
-        this.stopTimer(); 
-        buttonStart!.style.display = 'inline-block';
-        buttonStop.style.display = 'none';
-        videoRecorded!.style.display = 'inline-block';
-        DownloadRecordedVideobtn!.style.display = 'inline-block';
+      if (!MediaRecorder.isTypeSupported('video/webm')) {
+        console.warn('video/webm is not supported');
+      }
+
+      this.mediaRecorder = new MediaRecorder(stream, {
+        mimeType: 'video/webm',
       });
-    }
 
-    if (videoRecorded) {
-      mediaRecorder.addEventListener('dataavailable', (event: BlobEvent) => {
-        if (event.data) {
-          videoRecorded.src = URL.createObjectURL(event.data);
-          videoRecorded.style.display = 'inline-block';
+      this.mediaRecorder.addEventListener('dataavailable', (event: BlobEvent) => {
+        if (event.data.size > 0) {
+          this.videoRecorded.src = URL.createObjectURL(event.data);
+          this.videoRecorded.style.display = 'inline-block';
         }
       });
+
+      this.buttonStart.addEventListener('click', () => this.startVideo());
+      this.buttonStop.addEventListener('click', () => this.stopVideo());
+    } catch (err) {
+      console.error('Error accessing media devices:', err);
     }
   }
 
-  public startTimer(): void {
-    const storedStartTime = localStorage.getItem('timerStartTime');
-    if (!storedStartTime) {
-      this.startTime = Date.now();
-      localStorage.setItem('timerStartTime', this.startTime.toString());
-    } else {
-      this.startTime = parseInt(storedStartTime, 10);
-    }
+  startVideo() {
+    
+    console.log('Starting video recording');
+    this.mediaRecorder!.start();
+    this.startTimer();
+    this.buttonStart.style.display = 'none';
+    this.buttonStop.style.display = 'inline-block';
+    this.videoRecorded.style.display = 'none';
+    // this.downloadRecordedVideobtn.style.display = 'none';
 
+    setTimeout(() => {
+      if (this.mediaRecorder && this.mediaRecorder.state === 'recording') {
+        console.log('Stopping video recording after 10 seconds');
+        this.mediaRecorder.stop();
+        this.stopTimer();
+        this.buttonStart.style.display = 'inline-block';
+        this.buttonStop.style.display = 'none';
+        this.videoRecorded.style.display = 'inline-block';
+        // this.downloadRecordedVideobtn.style.display = 'inline-block';
+      }
+    }, 10000); // Stop recording after 10 seconds
+  }
+
+  stopVideo() {
+    if (this.mediaRecorder && this.mediaRecorder.state === 'recording') {
+      console.log('Stopping video recording manually');
+      this.mediaRecorder.stop();
+      this.stopTimer();
+      this.buttonStart.style.display = 'inline-block';
+      this.buttonStop.style.display = 'none';
+      this.videoRecorded.style.display = 'inline-block';
+      // this.downloadRecordedVideobtn.style.display = 'inline-block';
+    }
+  }
+
+
+  public startTimer(): void {
+    this.startTime = Date.now();
     this.timerInterval = setInterval(() => {
       const elapsedTime = Date.now() - this.startTime;
       this.timerValue = this.formatTime(elapsedTime);
@@ -139,13 +148,8 @@ export class HomeComponent implements OnInit {
 
   public stopTimer(): void {
     clearInterval(this.timerInterval);
-    const startTimeString = localStorage.getItem('timerStartTime');
-    if (startTimeString) {
-      const startTime = parseInt(startTimeString, 10);
-      const elapsedTime = Date.now() - startTime;
-      this.timerValue = this.formatTime(elapsedTime);
-      localStorage.removeItem('timerStartTime');
-    }
+    const elapsedTime = Date.now() - this.startTime;
+    this.timerValue = this.formatTime(elapsedTime);
   }
 
   private formatTime(milliseconds: number): string {
@@ -158,6 +162,8 @@ export class HomeComponent implements OnInit {
   private padZero(num: number): string {
     return num < 10 ? '0' + num : num.toString();
   }
+  openModal() {
+    const modalElement = this.exampleModal.nativeElement;
 
-  
+  }
 }
