@@ -1,6 +1,7 @@
 import { Component, ElementRef, OnInit, AfterViewInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Init } from 'v8';
 
 @Component({
   selector: 'app-home',
@@ -10,7 +11,7 @@ import { FormsModule } from '@angular/forms';
   styleUrls: ['./home.component.css'],
   encapsulation: ViewEncapsulation.None
 })
-export class HomeComponent implements AfterViewInit {
+export class HomeComponent implements OnInit, AfterViewInit {
   public currentPage: string = '';
   public availableCameras: MediaDeviceInfo[] = [];
   public selectedCamera: MediaDeviceInfo | null = null;
@@ -28,10 +29,12 @@ export class HomeComponent implements AfterViewInit {
 
   constructor() { }
 
-
+ngOnInit(): void {
+  this.main();
+}
   ngAfterViewInit(): void {
     this.queryDomElements();
-    this.main();
+
   }
 
   queryDomElements(): void {
