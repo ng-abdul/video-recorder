@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HomeComponent } from './home/home.component';
-
+import 'zone.js';
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -10,5 +10,5 @@ import { HomeComponent } from './home/home.component';
   styleUrl: './app.component.css'
 })
 export class AppComponent {
-  title = 'call-app';
+  title = 'video-recorder';
 }

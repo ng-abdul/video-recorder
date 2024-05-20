@@ -1,11 +1,11 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { of } from 'rxjs';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { HomeComponent } from './home.component';
 
 describe('HomeComponent', () => {
   let component: HomeComponent;
   let fixture: ComponentFixture<HomeComponent>;
-
+  let mediaRecorderMock: jasmine.SpyObj<MediaRecorder>;
+    let state: 'inactive' | 'recording' | 'paused';
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [HomeComponent]
@@ -14,52 +14,61 @@ describe('HomeComponent', () => {
     
     fixture = TestBed.createComponent(HomeComponent);
     component = fixture.componentInstance;
+    component.buttonStart = document.createElement('button');
+    component.buttonStop = document.createElement('button');
+    component.videoRecorded = document.createElement('video');
+
+    mediaRecorderMock = jasmine.createSpyObj('MediaRecorder', ['start', 'stop']);
+
+        state = 'inactive';
+        Object.defineProperty(mediaRecorderMock, 'state', {
+          get: () => 'inactive',
+          configurable: true
+        });
+    
+        component.mediaRecorder = mediaRecorderMock;
+    spyOn(component, 'startTimer').and.callThrough();
+    spyOn(component, 'stopTimer').and.callThrough();
+
     fixture.detectChanges();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
-  it('should start recording when start button is clicked', async () => {
-    const mediaRecorder = jasmine.createSpyObj('MediaRecorder', ['start', 'stop']);
-
-    const mockButtonStart = document.createElement('button');
-    mockButtonStart.id = 'startRecording';
-    mockButtonStart.click();
-    document.body.appendChild(mockButtonStart);
-     expect(mediaRecorder.start)
-    const mockButtonStop = document.createElement('button');
-    mockButtonStop.id = 'stopRecording';
-    document.body.appendChild(mockButtonStop);
+  it('should start and stop video recording after 10 seconds', fakeAsync(() => {
+    component.startVideo();
   
-    const mockVideoRecorded = document.createElement('video');
-    mockVideoRecorded.id = 'videoRecorded';
-    document.body.appendChild(mockVideoRecorded);
-  
-    const mockDownloadRecordedVideoBtn = document.createElement('button');
-    mockDownloadRecordedVideoBtn.className = 'DownloadRecordedVideo';
-    document.body.appendChild(mockDownloadRecordedVideoBtn);
-  
-    spyOn(navigator.mediaDevices, 'getUserMedia').and.returnValue(Promise.resolve({} as MediaStream));
-    spyOn(window, 'MediaRecorder').and.returnValue(mediaRecorder);
-  
-    await component.main();
-  
-  
-    expect(mediaRecorder.start).toHaveBeenCalled();
+    expect(component.mediaRecorder!.start).toHaveBeenCalled();
     expect(component.startTimer).toHaveBeenCalled();
-    expect(mockButtonStart.style.display).toBe('none');
-    expect(mockButtonStop.style.display).toBe('inline-block');
-    expect(mockVideoRecorded.style.display).toBe('none');
-    expect(mockDownloadRecordedVideoBtn.style.display).toBe('none');
+    expect(component.buttonStart.style.display).toBe('none');
+    expect(component.buttonStop.style.display).toBe('inline-block');
+    expect(component.videoRecorded.style.display).toBe('none');
   
-    document.body.removeChild(mockButtonStart);
-    document.body.removeChild(mockButtonStop);
-    document.body.removeChild(mockVideoRecorded);
-    document.body.removeChild(mockDownloadRecordedVideoBtn);
-  });
+    state = 'recording';
+    tick(10000);
+    tick(0);
+
+    expect(component.mediaRecorder.stop).toHaveBeenCalled();
+    expect(component.stopTimer).toHaveBeenCalled();
+    expect(component.buttonStart.style.display).toBe('inline-block');
+    expect(component.buttonStop.style.display).toBe('none');
+    expect(component.videoRecorded.style.display).toBe('inline-block');
+  }));
   
-  
+
+  it('should stop video recording ', fakeAsync(() => {
+    component.stopVideo()
+
+    state = 'inactive';
+    expect(component.mediaRecorder!.stop).toHaveBeenCalled();
+    expect(component.stopTimer).toHaveBeenCalled();
+    expect(component.buttonStart.style.display).toBe('inline-block');
+    expect(component.buttonStop.style.display).toBe('none');
+    expect(component.videoRecorded.style.display).toBe('inline-block');
+
+  }));
+
   it('should toggle camera', async () => {
     const mockStream = new MediaStream();
     spyOn(navigator.mediaDevices, 'getUserMedia').and.returnValue(Promise.resolve(mockStream));
@@ -67,14 +76,10 @@ describe('HomeComponent', () => {
     const videoElement = document.createElement('video');
     videoElement.id = 'videoLive';
     document.body.appendChild(videoElement);
-
     await component.toggleCamera();
-
     expect(component.isFrontCameraActive).toBe(false);
     expect((<HTMLVideoElement>document.getElementById('videoLive')).srcObject).toBe(mockStream);
-
     await component.toggleCamera();
-
     expect(component.isFrontCameraActive).toBe(true);
     document.body.removeChild(videoElement);
   });
@@ -84,11 +89,9 @@ describe('HomeComponent', () => {
     videoElement.id = 'videoRecorded';
     videoElement.src = 'blob:http://example.com/video';
     document.body.appendChild(videoElement);
-
     spyOn(document, 'createElement').and.callThrough();
 
     component.downloadVideo();
-
     expect(document.createElement).toHaveBeenCalledWith('a');
     document.body.removeChild(videoElement);
   });
@@ -103,5 +106,27 @@ describe('HomeComponent', () => {
     jasmine.clock().uninstall();
   });
 
+  it('should set up media stream and event listeners correctly in main function', async () => {
+    const getUserMediaSpy = spyOn(navigator.mediaDevices, 'getUserMedia').and.returnValue(Promise.resolve(new MediaStream()));
 
+    await component.main();
+    expect(getUserMediaSpy).toHaveBeenCalledWith({ video: true, audio: true });
+    expect(component.videoLive.srcObject).toBeDefined();
+    expect(component.mediaRecorder).toBeDefined();
+    expect(component.mediaRecorder.mimeType).toBe('video/webm');
+    expect(component.videoRecorded.src).toBeDefined();
+    expect(component.videoRecorded.style.display).toBe('none');
+  
+    spyOn(component, 'startVideo');
+    spyOn(component, 'stopVideo');
+
+    const button = fixture.nativeElement.querySelector('button'); 
+    button.click();
+    expect(component.startVideo).toHaveBeenCalled();
+    expect(component.stopVideo).toHaveBeenCalled()
+
+  });
 });
+
+
+

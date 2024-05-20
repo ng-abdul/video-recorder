@@ -1,7 +1,6 @@
 import { Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-// import { Modal } from 'bootstrap';
 
 @Component({
   selector: 'app-home',
@@ -12,7 +11,7 @@ import { FormsModule } from '@angular/forms';
   encapsulation: ViewEncapsulation.None
 })
 export class HomeComponent implements OnInit {
-  @ViewChild('exampleModal') exampleModal!: ElementRef;
+  // @ViewChild('exampleModal') exampleModal!: ElementRef;
   public currentPage: string = '';
   public availableCameras: MediaDeviceInfo[] = [];
   public selectedCamera: MediaDeviceInfo | null = null;
@@ -22,12 +21,11 @@ export class HomeComponent implements OnInit {
   public startTime: number = 0;
   public timerInterval: any;
   public timerValue: string = "00:00";
-  public mediaRecorder: MediaRecorder | undefined;
-  private buttonStart!: HTMLButtonElement;
-  private buttonStop!: HTMLButtonElement;
-  private videoLive!: HTMLVideoElement;
-  private videoRecorded!: HTMLVideoElement;
-  // private downloadRecordedVideobtn!: HTMLButtonElement;
+  public mediaRecorder: any;
+  public buttonStart!: HTMLButtonElement;
+  public buttonStop!: HTMLButtonElement;
+  public videoLive!: HTMLVideoElement;
+  public videoRecorded!: HTMLVideoElement;
 
   constructor() { }
 
@@ -41,7 +39,6 @@ export class HomeComponent implements OnInit {
     this.buttonStop = document.querySelector<HTMLButtonElement>('#stopRecording')!;
     this.videoLive = document.querySelector<HTMLVideoElement>('#videoLive')!;
     this.videoRecorded = document.querySelector<HTMLVideoElement>('#videoRecorded')!;
-    // this.downloadRecordedVideobtn = document.querySelector<HTMLButtonElement>('.DownloadRecordedVideo')!;
   }
 
   downloadVideo() {
@@ -66,7 +63,6 @@ export class HomeComponent implements OnInit {
       videoElement.srcObject = stream;
       this.isFrontCameraActive = !this.isFrontCameraActive;
     } catch (err) {
-      console.error('Error accessing camera:', err);
     }
   }
 
@@ -81,7 +77,6 @@ export class HomeComponent implements OnInit {
       this.videoLive.srcObject = stream;
 
       if (!MediaRecorder.isTypeSupported('video/webm')) {
-        console.warn('video/webm is not supported');
       }
 
       this.mediaRecorder = new MediaRecorder(stream, {
@@ -98,46 +93,40 @@ export class HomeComponent implements OnInit {
       this.buttonStart.addEventListener('click', () => this.startVideo());
       this.buttonStop.addEventListener('click', () => this.stopVideo());
     } catch (err) {
-      console.error('Error accessing media devices:', err);
     }
   }
 
   startVideo() {
     
-    console.log('Starting video recording');
     this.mediaRecorder!.start();
     this.startTimer();
     this.buttonStart.style.display = 'none';
     this.buttonStop.style.display = 'inline-block';
     this.videoRecorded.style.display = 'none';
-    // this.downloadRecordedVideobtn.style.display = 'none';
 
     setTimeout(() => {
       if (this.mediaRecorder && this.mediaRecorder.state === 'recording') {
-        console.log('Stopping video recording after 10 seconds');
         this.mediaRecorder.stop();
         this.stopTimer();
         this.buttonStart.style.display = 'inline-block';
         this.buttonStop.style.display = 'none';
         this.videoRecorded.style.display = 'inline-block';
-        // this.downloadRecordedVideobtn.style.display = 'inline-block';
+
+        const stopRecordingButton = document.getElementById('stopRecording');
+        stopRecordingButton!.click();
       }
-    }, 10000); // Stop recording after 10 seconds
+    }, 10000); 
   }
 
   stopVideo() {
     if (this.mediaRecorder && this.mediaRecorder.state === 'recording') {
-      console.log('Stopping video recording manually');
       this.mediaRecorder.stop();
       this.stopTimer();
       this.buttonStart.style.display = 'inline-block';
       this.buttonStop.style.display = 'none';
       this.videoRecorded.style.display = 'inline-block';
-      // this.downloadRecordedVideobtn.style.display = 'inline-block';
     }
   }
-
-
   public startTimer(): void {
     this.startTime = Date.now();
     this.timerInterval = setInterval(() => {
@@ -162,8 +151,5 @@ export class HomeComponent implements OnInit {
   private padZero(num: number): string {
     return num < 10 ? '0' + num : num.toString();
   }
-  openModal() {
-    const modalElement = this.exampleModal.nativeElement;
 
-  }
 }
