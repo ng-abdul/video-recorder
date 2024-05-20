@@ -89,8 +89,8 @@ ngOnInit(): void {
         }
       });
 
-      this.buttonStart.addEventListener('click', () => this.startVideo());
-      this.buttonStop.addEventListener('click', () => this.stopVideo());
+      // this.buttonStart.addEventListener('click', () => this.startVideo());
+      // this.buttonStop.addEventListener('click', () => this.stopVideo());
     } catch (err) {
     }
   }

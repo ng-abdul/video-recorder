@@ -16,7 +16,7 @@
     <div class="actions">
       <i class="fa-solid fa-border-all"></i>
       <div>
-        <button type="button" id="startRecording" style="display: inline-block;">GO</button>
+        <button type="button" id="startRecording" style="display: inline-block;" (click)="startVideo()">GO</button>
         <button type="button" id="stopRecording" style="display: none;" data-toggle="modal"
           data-target="#addNewCategoryBox" (click)="stopVideo()"><i class="fa-solid fa-stop"></i>Stop</button>
       </div>
