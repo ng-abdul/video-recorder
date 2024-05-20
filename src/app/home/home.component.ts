@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, OnInit, AfterViewInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -10,8 +10,7 @@ import { FormsModule } from '@angular/forms';
   styleUrls: ['./home.component.css'],
   encapsulation: ViewEncapsulation.None
 })
-export class HomeComponent implements OnInit {
-  // @ViewChild('exampleModal') exampleModal!: ElementRef;
+export class HomeComponent implements OnInit, AfterViewInit {
   public currentPage: string = '';
   public availableCameras: MediaDeviceInfo[] = [];
   public selectedCamera: MediaDeviceInfo | null = null;
@@ -30,8 +29,11 @@ export class HomeComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
-    this.queryDomElements();
     this.main();
+  }
+
+  ngAfterViewInit(): void {
+    this.queryDomElements();
   }
 
   queryDomElements(): void {
@@ -76,8 +78,8 @@ export class HomeComponent implements OnInit {
       this.mediaStream = stream;
       this.videoLive.srcObject = stream;
 
-      if (!MediaRecorder.isTypeSupported('video/webm')) {
-      }
+      // if (!MediaRecorder.isTypeSupported('video/webm')) {
+      // }
 
       this.mediaRecorder = new MediaRecorder(stream, {
         mimeType: 'video/webm',
@@ -90,6 +92,7 @@ export class HomeComponent implements OnInit {
         }
       });
 
+      // Ensure DOM elements are queried before adding event listeners
       this.buttonStart.addEventListener('click', () => this.startVideo());
       this.buttonStop.addEventListener('click', () => this.stopVideo());
     } catch (err) {
@@ -97,7 +100,6 @@ export class HomeComponent implements OnInit {
   }
 
   startVideo() {
-    
     this.mediaRecorder!.start();
     this.startTimer();
     this.buttonStart.style.display = 'none';
@@ -127,6 +129,7 @@ export class HomeComponent implements OnInit {
       this.videoRecorded.style.display = 'inline-block';
     }
   }
+
   public startTimer(): void {
     this.startTime = Date.now();
     this.timerInterval = setInterval(() => {
@@ -136,6 +139,7 @@ export class HomeComponent implements OnInit {
   }
 
   public stopTimer(): void {
+    console.log('Stopping timer...');
     clearInterval(this.timerInterval);
     const elapsedTime = Date.now() - this.startTime;
     this.timerValue = this.formatTime(elapsedTime);
@@ -151,5 +155,4 @@ export class HomeComponent implements OnInit {
   private padZero(num: number): string {
     return num < 10 ? '0' + num : num.toString();
   }
-
 }
