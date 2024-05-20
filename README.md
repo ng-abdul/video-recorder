@@ -14,7 +14,9 @@ Welcome to the Video Creator Application! This Angular 17 application allows use
 - Ensure seamless performance on mobile browsers, particularly iOS Chrome Browser
 ## Demo
 
+Experience the ease of recording videos with the Video Creator Application! Simply click the record button to start capturing your moments, and stop when you're done. Enjoy full screen playback for an immersive experience, and download your videos with just one click on save video button and cancel to  the video click on cancel button. You can also switch between cameras effortlessly and set video duration limits to suit your needs.
 
+Let's click on the [Demo](https://stackblitz.com/github/ng-abdul/video-recorder/tree/main?file=README.md) to check it out!
 
 
 ## Installation
@@ -26,9 +28,15 @@ Welcome to the Video Creator Application! This Angular 17 application allows use
 cd video-recorder
 
 ```
-- Install Dependencies:
+### Install Dependencies:
+- install initial pakeges
 ```bash
 npm install
+
+```
+or
+```bash
+  npm install -f
 
 ```
 

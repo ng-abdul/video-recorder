@@ -1,14 +1,14 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import{RouterTestingModule} from'@angular/router/testing'
+import { RouterTestingModule } from '@angular/router/testing'
 import { JoinMeetingComponent } from './join-meeting.component';
 import { Router } from '@angular/router';
 describe('JoinMeetingComponent', () => {
   let component: JoinMeetingComponent;
   let fixture: ComponentFixture<JoinMeetingComponent>;
-let router: Router
+  let router: Router
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [JoinMeetingComponent,RouterTestingModule]
+      imports: [JoinMeetingComponent, RouterTestingModule]
     })
       .compileComponents();
 

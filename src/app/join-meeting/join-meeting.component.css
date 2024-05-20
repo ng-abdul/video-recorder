@@ -35,7 +35,7 @@ body {
     justify-content: center;
     flex-direction: column;
     /* padding: 22px; */
-    background-color: lightgoldenrodyellow;
+    background-color: rgb(238, 238, 215);
 }
 
 .right p {

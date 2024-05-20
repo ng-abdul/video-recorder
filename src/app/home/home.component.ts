@@ -10,7 +10,7 @@ import { FormsModule } from '@angular/forms';
   styleUrls: ['./home.component.css'],
   encapsulation: ViewEncapsulation.None
 })
-export class HomeComponent implements OnInit, AfterViewInit {
+export class HomeComponent implements AfterViewInit {
   public currentPage: string = '';
   public availableCameras: MediaDeviceInfo[] = [];
   public selectedCamera: MediaDeviceInfo | null = null;
@@ -28,12 +28,10 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
   constructor() { }
 
-  ngOnInit(): void {
-    this.main();
-  }
 
   ngAfterViewInit(): void {
     this.queryDomElements();
+    this.main();
   }
 
   queryDomElements(): void {
@@ -47,7 +45,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
     const videoSrc = this.videoRecorded.src;
     const a = document.createElement('a');
     a.href = videoSrc;
-    console.log('click');
     a.download = 'video.mp4';
     a.click();
   }
@@ -78,9 +75,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
       this.mediaStream = stream;
       this.videoLive.srcObject = stream;
 
-      // if (!MediaRecorder.isTypeSupported('video/webm')) {
-      // }
-
       this.mediaRecorder = new MediaRecorder(stream, {
         mimeType: 'video/webm',
       });
@@ -92,7 +86,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
         }
       });
 
-      // Ensure DOM elements are queried before adding event listeners
       this.buttonStart.addEventListener('click', () => this.startVideo());
       this.buttonStop.addEventListener('click', () => this.stopVideo());
     } catch (err) {
@@ -107,27 +100,27 @@ export class HomeComponent implements OnInit, AfterViewInit {
     this.videoRecorded.style.display = 'none';
 
     setTimeout(() => {
-      if (this.mediaRecorder && this.mediaRecorder.state === 'recording') {
-        this.mediaRecorder.stop();
-        this.stopTimer();
-        this.buttonStart.style.display = 'inline-block';
-        this.buttonStop.style.display = 'none';
-        this.videoRecorded.style.display = 'inline-block';
-
-        const stopRecordingButton = document.getElementById('stopRecording');
-        stopRecordingButton!.click();
-      }
-    }, 10000); 
-  }
-
-  stopVideo() {
-    if (this.mediaRecorder && this.mediaRecorder.state === 'recording') {
+      // if (this.mediaRecorder && this.mediaRecorder.state === 'recording') {
       this.mediaRecorder.stop();
       this.stopTimer();
       this.buttonStart.style.display = 'inline-block';
       this.buttonStop.style.display = 'none';
       this.videoRecorded.style.display = 'inline-block';
-    }
+
+      const stopRecordingButton = document.getElementById('stopRecording');
+      stopRecordingButton!.click();
+      // }
+    }, 10000);
+  }
+
+  stopVideo() {
+    // if (this.mediaRecorder && this.mediaRecorder.state === 'recording') {
+    this.mediaRecorder.stop();
+    this.stopTimer();
+    this.buttonStart.style.display = 'inline-block';
+    this.buttonStop.style.display = 'none';
+    this.videoRecorded.style.display = 'inline-block';
+    // }
   }
 
   public startTimer(): void {

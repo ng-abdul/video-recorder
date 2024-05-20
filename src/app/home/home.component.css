@@ -9,8 +9,6 @@ body {
     justify-content: center;
     flex-direction: column;
     width: 100%;
-
-
 }
 
 .startBtn,
@@ -139,12 +137,23 @@ button:disabled {
     #startRecording {
         margin: 0px 30px;
     }
-    .startStopBtns{
+
+    .startStopBtns {
         height: 114px;
     }
 }
-.timmer{
+
+.timmer {
     color: white;
     padding: 2px 5px;
     font-size: 15px;
+}
+
+#timmer {
+    border: 0;
+    margin: 4px;
+    border-radius: 5px;
+    outline: none;
+    width: 118px;
+    text-align: start;
 }
